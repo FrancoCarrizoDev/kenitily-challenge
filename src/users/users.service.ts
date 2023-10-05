@@ -12,7 +12,7 @@ import { IUser } from './interfaces/user.interface';
 interface IUserService {
   create(createUserDto: CreateUserDto): Promise<IUser>;
   findAll(): Promise<IUser[]>;
-  update(id: number, updateUserDto: UpdateUserDto): string;
+  update(id: string, updateUserDto: UpdateUserDto): Promise<IUser>;
   uploadPhotoProfile(id: string, file: Express.Multer.File): string;
 }
 
@@ -37,8 +37,19 @@ export class UsersService implements IUserService {
     return this.userModel.find().exec();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    this.logger.debug(`Updating user #${id}`);
+
+    try {
+      const user = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+        new: true,
+      });
+
+      return user;
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException('Error updating user');
+    }
   }
 
   uploadPhotoProfile(id: string, file: Express.Multer.File) {

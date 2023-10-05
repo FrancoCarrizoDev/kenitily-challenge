@@ -12,8 +12,8 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ParseUserPipe } from 'src/pipes/parse-user.pipe';
 import { customDiskStorage } from '../utilities/custom-disk-storage';
+import { ValidateObjectIdPipe } from './pipes/object-id.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -25,17 +25,37 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @Patch(':id')
+  updatePictureProfile(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('file', { storage: customDiskStorage }))
-  async uploadFile(
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: customDiskStorage,
+      fileFilter(req, file, callback) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+          return callback(new Error('Only image files are allowed!'), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async create(
     @UploadedFile() file: Express.Multer.File,
-    @Body(ParseUserPipe) bodyParsed: any,
+    @Body() createUserDto: CreateUserDto,
   ) {
-    const createUserDto = bodyParsed as CreateUserDto;
     createUserDto.profile_picture = file.filename;
     return this.usersService.create(createUserDto);
   }

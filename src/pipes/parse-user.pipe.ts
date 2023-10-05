@@ -9,7 +9,7 @@ export class ParseUserPipe implements PipeTransform {
     const createUserDto = plainToInstance(CreateUserDto, parseData);
     const validations = await validate(createUserDto);
     if (validations.length > 0) {
-      throw new BadRequestException('Invalid ObjectId');
+      throw new BadRequestException(validations);
     }
     return createUserDto;
   }

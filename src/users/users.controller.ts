@@ -12,7 +12,6 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ParseObjectIdPipe } from 'src/pipes/parse-object-id.pipe';
 import { ParseUserPipe } from 'src/pipes/parse-user.pipe';
 import { customDiskStorage } from '../utilities/custom-disk-storage';
 
@@ -30,15 +29,6 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Post(':id/photo-profile')
-  @UseInterceptors(FileInterceptor('file', { dest: './uploads' }))
-  uploadPhotoProfile(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('id', ParseObjectIdPipe) id: string,
-  ) {
-    return this.usersService.uploadPhotoProfile(id, file);
-  }
-
   @Post()
   @UseInterceptors(FileInterceptor('file', { storage: customDiskStorage }))
   async uploadFile(
@@ -46,6 +36,7 @@ export class UsersController {
     @Body(ParseUserPipe) bodyParsed: any,
   ) {
     const createUserDto = bodyParsed as CreateUserDto;
+    createUserDto.profile_picture = file.filename;
     return this.usersService.create(createUserDto);
   }
 }

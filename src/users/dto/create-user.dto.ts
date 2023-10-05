@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsEmpty,
   IsNotEmpty,
   IsString,
   IsStrongPassword,
@@ -18,9 +19,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   readonly last_name: string;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly profile_picture: string;
+  @IsEmpty()
+  profile_picture: string;
 
   @IsEmail()
   readonly email: string;

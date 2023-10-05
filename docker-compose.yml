@@ -10,6 +10,13 @@ services:
         - 27017:27017
       volumes:
         - mongodb_data_cont:/data/db
+    nest-Cont:
+      image: nest-cloud-run
+      container_name: nest-Cont
+      ports:
+        - 3000:3000
+      depends_on:
+        - mongodb-Cont
 
 volumes:
   mongodb_data_cont:

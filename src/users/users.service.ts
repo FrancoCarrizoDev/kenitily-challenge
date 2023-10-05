@@ -37,6 +37,24 @@ export class UsersService implements IUserService {
     return this.userModel.find().exec();
   }
 
+  async updatePictureProfile(id: string, file: Express.Multer.File) {
+    try {
+      const user = await this.userModel.findByIdAndUpdate(
+        id,
+        {
+          profile_picture: file.filename,
+        },
+        {
+          new: true,
+        },
+      );
+      return user;
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException('Error updating user');
+    }
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     this.logger.debug(`Updating user #${id}`);
 

@@ -1,5 +1,9 @@
 # INIT PROJECT
 
+## POSTMAN COLLECTION
+
+Kenitily.postman_collection.json
+
 ## Install
 
 ```bash
